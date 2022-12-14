@@ -55,18 +55,18 @@ IOManager io;
 byte displayBright = 32;
 
 AsyncWebServer server(80);
-void notFound(AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not found");
-}
+// void notFound(AsyncWebServerRequest *request) {
+//     request->send(404, "text/plain", "Not found");
+// }
 
 
 void setupOtaServer()
 {
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", "Hi! I am ESP32. ota by ip/update");
-  });
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   request->send(200, "text/plain", "Hi! I am ESP32. ota by ip/update");
+  // });
 
-  server.onNotFound(notFound);
+  // server.onNotFound(notFound);
 
 
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
@@ -228,9 +228,9 @@ void loopNtp() {
 void setupSSDP()
 {
         Serial.printf("Starting HTTP...\n");
-        server.on("/index.html", HTTP_GET, [&](AsyncWebServerRequest *request) {
-            request->send(200, "text/plain", "Hello World!");
-        });
+        // server.on("/index.html", HTTP_GET, [&](AsyncWebServerRequest *request) {
+        //     request->send(200, "text/plain", "Hello World!");
+        // });
         server.on("/description.xml", HTTP_GET, [&](AsyncWebServerRequest *request) {
             request->send(200, "text/xml", SSDP.schema(false));
         });
@@ -243,7 +243,7 @@ void setupSSDP()
         SSDP.setHTTPPort(80);
         //set device name
         //Null string if not set
-        SSDP.setName("Philips hue clone");
+        SSDP.setName("Clock");
         //set Serial Number
         //Null string if not set
         SSDP.setSerialNumber("001788102201");
@@ -252,7 +252,7 @@ void setupSSDP()
         SSDP.setURL("index.html");
         //set model name
         //Null string if not set
-        SSDP.setModelName("Philips hue bridge 2012");
+        SSDP.setModelName("Clock");
         //set model description
         //Null string if not set
         SSDP.setModelDescription("This device can be controled by WiFi");
@@ -264,10 +264,10 @@ void setupSSDP()
         SSDP.setModelURL("http://www.meethue.com");
         //set model manufacturer name
         //Null string if not set
-        SSDP.setManufacturer("Royal Philips Electronics");
+        SSDP.setManufacturer("Manufacturer Clock");
         //set model manufacturer url
         //Null string if not set
-        SSDP.setManufacturerURL("http://www.philips.com");
+        SSDP.setManufacturerURL("http://www.....com");
         //set device type
         //"urn:schemas-upnp-org:device:Basic:1" if not set
         SSDP.setDeviceType("rootdevice"); //to appear as root device, other examples: MediaRenderer, MediaServer ...
@@ -323,6 +323,33 @@ void setupWifi()
   virtualDisp->setTextSize(1); 
   virtualDisp->setCursor(6, 10); 
   virtualDisp->print(WiFi.localIP());
+  delay(2000);
+}
+
+
+#include <ESPAsyncWiFiManager.h>         //https://github.com/tzapu/WiFiManager
+#include "DNSServer.h"
+
+DNSServer dns;
+
+void setupWifiManager() {
+
+    //WiFiManager
+    //Local intialization. Once its business is done, there is no need to keep it around
+    AsyncWiFiManager wifiManager(&server, &dns);
+    //reset saved settings
+    //wifiManager.resetSettings();
+    //set custom ip for portal
+    //wifiManager.setAPConfig(IPAddress(10,0,1,1), IPAddress(10,0,1,1), IPAddress(255,255,255,0));
+    //fetches ssid and pass from eeprom and tries to connect
+    //if it does not connect it starts an access point with the specified name
+    //here  "AutoConnectAP"
+    //and goes into a blocking loop awaiting configuration
+    wifiManager.autoConnect("Mario Clock", "12345678");
+    //or use this for auto generated name ESP + ChipID
+    //wifiManager.autoConnect();
+    //if you get here you have connected to the WiFi
+    Serial.println("connected...yeey :)");
 }
 
 void setup()
@@ -340,7 +367,8 @@ void setup()
   io.clockwiseLogo();
   io.wifiConnecting();
 
-  setupWifi();
+  // setupWifi();
+  setupWifiManager();
 
   io.ntpConnecting();
   cwDateTime.begin();
