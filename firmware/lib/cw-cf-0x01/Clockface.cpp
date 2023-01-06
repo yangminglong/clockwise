@@ -1,5 +1,6 @@
 
 #include "Clockface.h"
+#include <ESPNtpClient.h>
 
 EventBus eventBus;
 
@@ -34,6 +35,7 @@ Clockface::Clockface(VirtualMatrixPanel* display) {
 void Clockface::setup(CWDateTime *dateTime) {
   _dateTime = dateTime;
 
+  Locator::getDisplay()->setTextSize(1);
   Locator::getDisplay()->setFont(&Super_Mario_Bros__24pt7b);
   Locator::getDisplay()->fillRect(0, 0, Locator::getDisplay()->width(), Locator::getDisplay()->height(), SKY_COLOR);
 
@@ -41,10 +43,10 @@ void Clockface::setup(CWDateTime *dateTime) {
 
   hill.draw(0, Locator::getDisplay()->height()-ground._height-hill._height);
   bush.draw(Locator::getDisplay()->width()-21, Locator::getDisplay()->height()-ground._height-bush._height);
-  cloud1.draw(0, 21);
-  cloud2.draw(51, 7);
-  cloud3.draw(51+13, 7);
-  cloud4.draw(Locator::getDisplay()->width()-13, 33);
+  cloud1.draw(0, 53);
+  cloud2.draw(51, 39);
+  cloud3.draw(51+13, 39);
+  cloud4.draw(Locator::getDisplay()->width()-13, 65);
 
   updateTime();
 
@@ -78,9 +80,6 @@ void Clockface::updateDayNight(DayNightType dayNightType )
   cloud3.draw(51+13, 7);
   cloud4.draw(Locator::getDisplay()->width()-13, 33);
 
-  updateTime();
-
-  update();
 
 }
 
@@ -103,11 +102,12 @@ void Clockface::update(bool doNow) {
     updateTime();
     lastMillis = millis();
 
-    if (m_curDayNight == Day && (_dateTime->getHour() < 6 || _dateTime->getHour() > 18)) {
-      updateDayNight(Night);
-    } else if (m_curDayNight == Night && (_dateTime->getHour() >=6 && _dateTime->getHour() <= 18)) {
-      updateDayNight(Day);
-    }
+    // if (m_curDayNight == Day && (_dateTime->getHour() < 6 || _dateTime->getHour() > 18)) {
+    //   updateDayNight(Night);
+    // } else if (m_curDayNight == Night && (_dateTime->getHour() >=6 && _dateTime->getHour() <= 18)) {
+    //   updateDayNight(Day);
+    // }
+
 
     Serial.println(_dateTime->getFormattedTime());
 
@@ -115,14 +115,18 @@ void Clockface::update(bool doNow) {
       preDate = _dateTime->getSecond();
 
       // update DateTime
-        // virtualDisp->printUTF8("2022年06月");
-  // virtualDisp->setTextSize(3);
-  // virtualDisp->setCursor(15,40);
-  // virtualDisp->printUTF8("10");
-  // virtualDisp->setTextSize(1); 
-  // virtualDisp->setCursor(65,68);
-  // virtualDisp->printUTF8("日");
-      Locator::getDisplay()->print("");
+      //Locator::getDisplay()->setFont(&Super_Mario_Bros__24pt7b);
+      Locator::getDisplay()->fillRect(0, 0, Locator::getDisplay()->width(), 42, SKY_COLOR);
+
+      Locator::getDisplay()->setTextColor(Locator::getDisplay()->color565(150,100,60));
+
+      Locator::getDisplay()->setTextSize(1);
+      Locator::getDisplay()->setCursor(20,10);
+      Locator::getDisplay()->printf("%s", NTP.getTimeDateString(time(NULL), "%04Y/%02m"));
+
+      Locator::getDisplay()->setTextSize(2);
+      Locator::getDisplay()->setCursor(32, 32);
+      Locator::getDisplay()->printf("%s", NTP.getTimeDateString(time(NULL), "%02d"));
     }
 
   }

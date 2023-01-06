@@ -62,9 +62,9 @@ AsyncWebServer server(80);
 
 void setupOtaServer()
 {
-  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(200, "text/plain", "Hi! I am ESP32. ota by ip/update");
-  // });
+  server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Hi! I am ESP32. ota by ip/update");
+  });
 
   // server.onNotFound(notFound);
 
@@ -123,7 +123,7 @@ void displaySetup()
   virtualDisp = new VirtualMatrixPanel((*dma_display), NUM_ROWS, NUM_COLS, PANEL_RES_X, PANEL_RES_Y, SERPENT, TOPDOWN);
 
   // virtualDisp->setRotate(true);
-  virtualDisp->setRotation(0);
+  virtualDisp->setRotation(2);
 }
 
 //#include "WifiConfig.h"
@@ -190,22 +190,18 @@ void setupNtp()
       syncEventTriggered = true;
   });
 
+  NTP.setTimeZone (TZ_Etc_GMTm8);
+  NTP.setInterval (600);
+  NTP.setNTPTimeout (NTP_TIMEOUT);
+  // NTP.setMinSyncAccuracy (5000);
+  // NTP.settimeSyncThreshold (3000);
+  NTP.begin (ntpServer);
 
 }
 
 void loopNtp() {
   static int i = 0;
   static int last = 0;
-
-  if (wifiFirstConnected) {
-      wifiFirstConnected = false;
-      NTP.setTimeZone (TZ_Etc_GMTm8);
-      NTP.setInterval (600);
-      NTP.setNTPTimeout (NTP_TIMEOUT);
-      // NTP.setMinSyncAccuracy (5000);
-      // NTP.settimeSyncThreshold (3000);
-      NTP.begin (ntpServer);
-  }
 
   if (syncEventTriggered) {
       syncEventTriggered = false;
@@ -215,13 +211,13 @@ void loopNtp() {
   if ((millis () - last) > SHOW_TIME_PERIOD) {
       last = millis ();
       time_t curTime = time(NULL);
-      String monStr  = NTP.getTimeDateString(curTime, "%02y年%02m月");
-      String dateStr = NTP.getTimeDateString(curTime, "%02d日");
-      String timeStr = NTP.getTimeDateString(curTime, "%02H:%02M:%02S");
+      // String monStr  = NTP.getTimeDateString(curTime, "%02y年%02m月");
+      // String dateStr = NTP.getTimeDateString(curTime, "%02d日");
+      // String timeStr = NTP.getTimeDateString(curTime, "%02H:%02M:%02S");
 
-      Serial.println(dateStr);
-      Serial.println(timeStr);
-
+      // Serial.println(dateStr);
+      // Serial.println(timeStr);
+      // Serial.println("time updated.");
   }
 }
 
@@ -345,7 +341,7 @@ void setupWifiManager() {
     //if it does not connect it starts an access point with the specified name
     //here  "AutoConnectAP"
     //and goes into a blocking loop awaiting configuration
-    wifiManager.autoConnect("Mario Clock", "12345678");
+    wifiManager.autoConnect("Mario Clock 1-8", "12345678");
     //or use this for auto generated name ESP + ChipID
     //wifiManager.autoConnect();
     //if you get here you have connected to the WiFi

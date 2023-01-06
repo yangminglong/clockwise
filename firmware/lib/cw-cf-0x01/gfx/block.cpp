@@ -33,6 +33,7 @@ void Block::hit() {
 
 void Block::setTextBlock() {
   Locator::getDisplay()->setTextColor(0x0000);       
+  Locator::getDisplay()->setTextSize(1);
   
   
   if (_text.length() == 1) {
